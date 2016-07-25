@@ -1,7 +1,9 @@
-(defpackage tk.zptm.succinct.rankselect
-  (:use :common-lisp))
+(defpackage succinct.rankselect
+  (:use :succinct.rankselect.rank
+	:succinct.rankselect.select
+	:common-lisp))
 
-(in-package tk.zptm.succinct.rankselect)
+(in-package succinct.rankselect)
 
 
 ;;; auxilary functions for bits and integers

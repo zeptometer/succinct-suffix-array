@@ -1,10 +1,10 @@
-(defpackage tk.zptm.succinct.bitwise-vector
+(defpackage succinct.bitwise-vector
   (:use :common-lisp
-	:tk.zptm.succinct.types)
+	:succinct.types)
   (:export create-bitwise-vector
 	   bwvref))
 
-(in-package tk.zptm.succinct.bitwise-vector)
+(in-package succinct.bitwise-vector)
 
 (defstruct bitwise-vector
   element-size

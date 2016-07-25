@@ -1,11 +1,11 @@
-(defpackage tk.zptm.bits
+(defpackage succinct.bits
   (:use :common-lisp
-	:tk.zptm.succinct.types)
+	:succinct.types)
   (:export create-bits
 	   bref
 	   extract-bits))
 
-(in-package tk.zptm.bits)
+(in-package succinct.bits)
 
 (defstruct bits
   length
