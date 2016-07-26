@@ -1,5 +1,6 @@
 (defpackage succinct.rankselect.rank
   (:use :common-lisp
+	:succinct.common
 	:succinct.bits
 	:succinct.bitwise-vector)
   (:export :create-rank-index
@@ -11,9 +12,6 @@
 (defun lognth (n idx)
   (logand 1 (ash n (- idx))))
 
-(defun log-length (n)
-  (* 2 (ceiling (/ (log n 2) 2))))
-
 (labels ((log-length (n) (* 2 (ceiling (/ (log n 2) 2)))))
 
   (defun largeblock-size (n)
@@ -21,9 +19,6 @@
 
   (defun smallblock-size (n)
     (/ (log-length n) 2)))
-
-(defun num-size (n)
-  (ceiling (log (log n 2) 2)))
 
 
 ;;;; Rank Index
@@ -44,8 +39,8 @@
 (defun make-r1-table (bits)
   (let* ((len        (length bits))
 	 (block-size (largeblock-size len))
-	 (table-size (ceiling (/ len block-size)))
-	 (elm-size   (ceiling (log block-size 2)))
+	 (table-size (ceiling len block-size))
+	 (elm-size   (lb block-size))
 	 (table      (create-bitwise-vector elm-size table-size)))
     (loop
        for i from 0 below table-size
@@ -60,12 +55,12 @@
 	 (block-size          (smallblock-size len))
 	 (blocks-per-r1-block (/ (largeblock-size len)
 				 (smallblock-size len)))
-	 (table-size          (ceiling (/ len block-size)))
-	 (elm-size            (ceiling (log block-size 2)))
+	 (table-size          (ceiling len block-size))
+	 (elm-size            (lb block-size))
 	 (table               (create-bitwise-vector elm-size table-size)))
     (loop
        for i from 0 below table-size
-       for n-ones = (count-ones-in-block-size bits i block-size)
+       for n-ones = (count-ones-in-block bits i block-size)
        for rank = (if (zerop (mod i blocks-per-r1-block))
 		      n-ones
 		      (+ rank n-ones))
@@ -83,7 +78,7 @@
   (let* ((len          (length bits))
 	 (pattern-size (smallblock-size len))
 	 (table-size   (expt 2 pattern-size))
-	 (elm-size     (ceiling (log pattern-size 2)))
+	 (elm-size     (lb pattern-size))
 	 (table        (create-bitwise-vector elm-size table-size)))
     (loop
        for i from 0 below table-size

@@ -1,6 +1,6 @@
 (defpackage succinct.bits
   (:use :common-lisp
-	:succinct.types)
+	:succinct.common)
   (:export create-bits
 	   bref
 	   extract-bits))

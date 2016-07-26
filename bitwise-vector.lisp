@@ -1,6 +1,6 @@
 (defpackage succinct.bitwise-vector
   (:use :common-lisp
-	:succinct.types)
+	:succinct.common)
   (:export create-bitwise-vector
 	   bwvref))
 
