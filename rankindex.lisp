@@ -100,9 +100,9 @@
 
 ;;; Rank Index Accessor
 (defun rank-with-index (bits index n)
-  (let* ((r1idx (floor (/ n (rank-index-r1-size index))))
-	 (r2idx (floor (/ n (rank-index-r2-size index))))
-	 (rem   (mod n (rank-index-r2-size index)))
+  (let* ((r1idx   (floor (/ n (rank-index-r1-size index))))
+	 (r2idx   (floor (/ n (rank-index-r2-size index))))
+	 (rem     (mod n (rank-index-r2-size index)))
 	 (r1-rank (if (zerop r1idx)
 		      0
 		      (bwvref (rank-index-r1 index) (1- r1idx))))

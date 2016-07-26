@@ -13,8 +13,8 @@
 
 (defun create-bits (length)
   (make-bits :length length
-		   :array (make-array (/ length 64)
-				      :element-type 'word)))
+	     :array (make-array (/ length 64)
+				:element-type 'word)))
 
 (defun bref (bits idx)
   (multiple-value-bind (div rem) (floor idx 64)
