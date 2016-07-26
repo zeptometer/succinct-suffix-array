@@ -33,11 +33,11 @@
   (loop
      for j from 0 below block-size
      for idx = (+ (* block-idx block-size) j)
-     while (< idx (length bits))
+     while (< idx (bits-length bits))
      sum (bref bits (+ (* block-idx block-size) j))))
 
 (defun make-r1-table (bits)
-  (let* ((len        (length bits))
+  (let* ((len        (bits-length bits))
 	 (block-size (largeblock-size len))
 	 (table-size (ceiling len block-size))
 	 (elm-size   (lb block-size))
@@ -51,7 +51,7 @@
 
 ;; R2 table
 (defun make-r2-table (bits)
-  (let* ((len                 (length bits))
+  (let* ((len                 (bits-length bits))
 	 (block-size          (smallblock-size len))
 	 (blocks-per-r1-block (/ (largeblock-size len)
 				 (smallblock-size len)))
@@ -75,7 +75,7 @@
      sum (logand i 1)))
 
 (defun make-r3-table (bits)
-  (let* ((len          (length bits))
+  (let* ((len          (bits-length bits))
 	 (pattern-size (smallblock-size len))
 	 (table-size   (expt 2 pattern-size))
 	 (elm-size     (lb pattern-size))
@@ -87,16 +87,16 @@
 
 ;; toplevel constructor
 (defun create-rank-index (bits)
-  (make-rank-index :r1-size (largeblock-size (length bits))
-		   :r2-size (smallblock-size (length bits))
+  (make-rank-index :r1-size (largeblock-size (bits-length bits))
+		   :r2-size (smallblock-size (bits-length bits))
 		   :r1 (make-r1-table bits)
 		   :r2 (make-r2-table bits)
 		   :r3 (make-r3-table bits)))
 
 ;;; Rank Index Accessor
 (defun rank-with-index (bits index n)
-  (let* ((r1idx   (floor (/ n (rank-index-r1-size index))))
-	 (r2idx   (floor (/ n (rank-index-r2-size index))))
+  (let* ((r1idx   (floor n (rank-index-r1-size index)))
+	 (r2idx   (floor n (rank-index-r2-size index)))
 	 (rem     (mod n (rank-index-r2-size index)))
 	 (r1-rank (if (zerop r1idx)
 		      0
