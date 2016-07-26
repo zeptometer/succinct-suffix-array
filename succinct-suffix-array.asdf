@@ -1,0 +1,19 @@
+;; -*- mode: lisp -*-
+
+(asdf:defsystem "succinct-suffix-array"
+    :description "succinct-suffix-array: implementation of compressed suffix array in Common Lisp"
+    :version "0.0.1"
+    :author "Yuito Murase <yuito.murase@gmail.com>"
+    :licence "MIT License"
+    :depends-on ()
+    :components ((:file "common")
+		 (:file "bits"
+			:depends-on ("common"))
+		 (:file "bitwise-vector"
+			:depends-on ("common"))
+		 (:file "rankindex"
+			:depends-on ("bits" "bitwise-vector"))
+		 (:file "selectindex"
+			:depends-on ("bits" "bitwise-vector"))
+		 (:file "rankselect"
+			:depends-on ("rankindex" "selectindex"))))
