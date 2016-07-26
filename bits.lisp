@@ -3,6 +3,7 @@
 	:succinct.common)
   (:export create-bits
 	   bref
+	   bits-length
 	   extract-bits))
 
 (in-package succinct.bits)
