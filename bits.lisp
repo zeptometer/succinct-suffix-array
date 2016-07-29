@@ -27,8 +27,8 @@
      (setf (ldb (byte 1 rem) (aref (bits-array ,bits) div)) ,new)))
 
 (defun extract-bits (bits size position)
-  (assert (<= 1 size 64))
-  (assert (< -1 position (+ size position) (bits-length bits)))
+  (assert (<= 0 size 64))
+  (assert (<= 0 position (+ size position) (1- (bits-length bits))))
   (if (= (floor position 64)
 	 (floor (+ size position -1) 64))
       (multiple-value-bind (div rem) (floor position 64)

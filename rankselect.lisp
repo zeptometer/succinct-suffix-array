@@ -4,7 +4,8 @@
 	:succinct.rankselect.select)
   (:export :create-rankselect
 	   :rank
-	   :select))
+	   :select
+	   :index-size))
 
 (in-package succinct.rankselect)
 
@@ -28,3 +29,7 @@
   (query-select-index (rankselect-bits rankselect)
 		      (rankselect-select-index rankselect)
 		      n))
+
+(defun index-size (rankselect)
+  (+ (rank-index-size (rankselect-rank-index rankselect))
+     (select-index-size (rankselect-select-index rankselect))))

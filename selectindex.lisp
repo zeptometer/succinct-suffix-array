@@ -4,7 +4,8 @@
 	:succinct.bits
 	:succinct.bitwise-vector)
   (:export :create-select-index
-	   :query-select-index))
+	   :query-select-index
+	   :select-index-size))
 
 (in-package succinct.rankselect.select)
 
@@ -14,6 +15,9 @@
 ;;; data structure
 (defstruct large-block0
   table)
+
+(defun large-block0-size (block)
+  (length (large-block0-table block)))
 
 (defstruct large-block1
   ;;; point where this block starts
@@ -27,9 +31,21 @@
   tree
   tree-depth)
 
+(defun large-block1-size (block)
+  (+ (length (large-block1-small-blocks block))
+     (length (large-block1-small-offsets block))
+     (length (large-block1-tree block))))
+
 (defstruct select-index
   ones-per-block
   blocks)
+
+(defun select-index-size (index)
+  (loop
+     for block across (select-index-blocks index)
+     sum (etypecase block
+	   (large-block0 (large-block0-size block))
+	   (large-block1 (large-block1-size block)))))
 
 ;;; construct select index
 (defun ones-per-large-block (len)
@@ -86,12 +102,12 @@
   (let* ((blocks-size      (popcount-range bits from to))
 	 (blocks-elm-size  (lb size))
 	 (blocks           (create-bitwise-vector blocks-elm-size blocks-size))
-	 (offsets-size     (ceiling (bits-length bits) size))
+	 (offsets-size     (ceiling (- to from -1) size))
 	 (offsets-elm-size (lb blocks-size))
 	 (offsets          (create-bitwise-vector offsets-elm-size offsets-size)))
     (loop
        with offset = 0
-       for block-idx from 0 below blocks-size
+       for block-idx from 0 below offsets-size
        do (setf (bwvref offsets block-idx) offset)
        do (loop
 	     for i from 0 below size
@@ -101,13 +117,14 @@
 	     sum bit into n-ones
 	     when (= 1 bit)
 	     do (setf (bwvref blocks (+ offset n-ones -1)) i)
-	     finally (incf offset n-ones)))))
+	     finally (incf offset n-ones)))
+    (values offsets blocks)))
 
 (defun create-large-block1 (bits from to)
   (let* ((len  (bits-length bits))
 	 (size (small-block-size len))
 	 (n-branch (get-n-branch len)))
-    (multiple-value-bind (tree depth) (create-tree bits from to size n-branch)
+    (multiple-value-bind (depth tree) (create-tree bits from to size n-branch)
       (multiple-value-bind (small-offsets small-blocks) (create-small-blocks bits from to size)
 	(make-large-block1 :offset from
 			   :small-block-size size
@@ -146,8 +163,8 @@
 (defun create-large-block (bits from to)
   (let ((border (pow border-const (lb (bits-length bits)))))
     (if (> (- to from -1) border)
-	(progn (princ 0) (create-large-block0 bits from to) )
-	(progn (princ 1) (create-large-block1 bits from to)))))
+	(create-large-block0 bits from to) 
+	(create-large-block1 bits from to))))
 
 (defun select-large-block (block n)
   (etypecase block
@@ -168,7 +185,6 @@
     (loop
        for block_idx from 0 below n-blocks
        with bits_idx = 0
-       do (format t "done ~a~%" block_idx)
        do (loop
 	     for j from bits_idx below len
 	     sum (bref bits j) into n-ones

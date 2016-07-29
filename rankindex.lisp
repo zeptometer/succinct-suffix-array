@@ -4,7 +4,8 @@
 	:succinct.bits
 	:succinct.bitwise-vector)
   (:export :create-rank-index
-	   :query-rank-index))
+	   :query-rank-index
+	   :rank-index-size))
 
 (in-package :succinct.rankselect.rank)
 
@@ -26,6 +27,10 @@
   r1-size r2-size
   r1 r2 r3)
 
+(defun rank-index-size (index)
+  (+ (length (rank-index-r1 index))
+     (length (rank-index-r2 index))
+     (length (rank-index-r3 index))))
 
 ;;; Rank Index Constructor
 ;; R1 table
