@@ -94,7 +94,7 @@
 		   :r3 (make-r3-table bits)))
 
 ;;; Rank Index Accessor
-(defun rank-with-index (bits index n)
+(defun query-rank-index (bits index n)
   (let* ((r1idx   (floor n (rank-index-r1-size index)))
 	 (r2idx   (floor n (rank-index-r2-size index)))
 	 (rem     (mod n (rank-index-r2-size index)))

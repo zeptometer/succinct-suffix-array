@@ -1,7 +1,7 @@
 (defpackage succinct.rankselect
-  (:use :succinct.rankselect.rank
-	:succinct.rankselect.select
-	:common-lisp))
+  (:use :common-lisp
+	:succinct.rankselect.rank
+	:succinct.rankselect.select))
 
 (in-package succinct.rankselect)
 
@@ -16,10 +16,12 @@
 		   :rank-index (create-rank-index bits)
 		   :select-index (create-select-index bits)))
 
-(defun rank (rankselect)
-  (rank-with-index (rankselect-bits rankselect)
-		   (rankselect-rank-index rankselect)))
+(defun rank (rankselect n)
+  (query-rank-index (rankselect-bits rankselect)
+		    (rankselect-rank-index rankselect)
+		    n))
 
-(defun select (rankselect)
-  (select-with-index (rankselect-bits rankselect)
-		     (rankkselect-select-index rankselect)))
+(defun select (rankselect n)
+  (query-select-index (rankselect-bits rankselect)
+		      (rankselect-select-index rankselect)
+		      n))
