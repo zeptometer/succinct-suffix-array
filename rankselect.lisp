@@ -1,7 +1,10 @@
 (defpackage succinct.rankselect
   (:use :common-lisp
 	:succinct.rankselect.rank
-	:succinct.rankselect.select))
+	:succinct.rankselect.select)
+  (:export :create-rankselect
+	   :rank
+	   :select))
 
 (in-package succinct.rankselect)
 

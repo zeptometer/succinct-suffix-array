@@ -40,13 +40,13 @@
   (let* ((len        (bits-length bits))
 	 (block-size (largeblock-size len))
 	 (table-size (ceiling len block-size))
-	 (elm-size   (lb block-size))
+	 (elm-size   (lb len))
 	 (table      (create-bitwise-vector elm-size table-size)))
     (loop
        for i from 0 below table-size
        for n-ones = (count-ones-in-block bits i block-size)
-       for rank = n-ones then (+ rank n-ones)
-       do (setf (bwvref table i) rank))
+       sum n-ones into rank
+       do (setf (bwvref table i) (- rank n-ones)))
     table))
 
 ;; R2 table
@@ -56,7 +56,7 @@
 	 (blocks-per-r1-block (/ (largeblock-size len)
 				 (smallblock-size len)))
 	 (table-size          (ceiling len block-size))
-	 (elm-size            (lb block-size))
+	 (elm-size            (lb (largeblock-size len)))
 	 (table               (create-bitwise-vector elm-size table-size)))
     (loop
        for i from 0 below table-size
@@ -98,11 +98,7 @@
   (let* ((r1idx   (floor n (rank-index-r1-size index)))
 	 (r2idx   (floor n (rank-index-r2-size index)))
 	 (rem     (mod n (rank-index-r2-size index)))
-	 (r1-rank (if (zerop r1idx)
-		      0
-		      (bwvref (rank-index-r1 index) (1- r1idx))))
-	 (r2-rank (if (zerop r2idx)
-		      0
-		      (bwvref (rank-index-r2 index) (1- r2idx))))
+	 (r1-rank (bwvref (rank-index-r1 index) r1idx))
+	 (r2-rank (bwvref (rank-index-r2 index) r2idx))
 	 (r3-rank (bwvref (rank-index-r3 index) (extract-bits bits rem (- n rem)))))
     (+ r1-rank r2-rank r3-rank)))

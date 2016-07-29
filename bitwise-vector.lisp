@@ -15,8 +15,8 @@
 (defun create-bitwise-vector (element-size length)
   (assert (< element-size 64))
   (let* ((elements-per-word (floor 64 element-size))
-	 (array-size (floor length elements-per-word)))
-      (make-bitwise-vector :element-size element-size
+	 (array-size (ceiling length elements-per-word)))
+    (make-bitwise-vector :element-size element-size
 			   :elements-per-word elements-per-word
 			   :length length
 			   :array (make-array array-size
@@ -31,8 +31,12 @@
 	 (aref (bitwise-vector-array bv) div))))
 
 (defsetf bwvref (bv n) (bits)
-  `(multiple-value-bind (div rem) (floor ,n (bitwise-vector-elements-per-word ,bv))
-     (setf (ldb (byte (bitwise-vector-element-size ,bv)
-		      (* (bitwise-vector-element-size ,bv) rem))
-		(aref (bitwise-vector-array ,bv) div))
-	   ,bits)))
+  `(progn
+     (assert (< -1 ,n (bitwise-vector-length ,bv)))
+     (assert (or (zerop ,bits)
+		 (<= (lb ,bits) (bitwise-vector-element-size ,bv))))
+     (multiple-value-bind (div rem) (floor ,n (bitwise-vector-elements-per-word ,bv))
+       (setf (ldb (byte (bitwise-vector-element-size ,bv)
+			(* (bitwise-vector-element-size ,bv) rem))
+		  (aref (bitwise-vector-array ,bv) div))
+	     ,bits))))

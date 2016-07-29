@@ -1,7 +1,8 @@
 (defpackage succinct.common
   (:use :common-lisp)
   (:export word
-           lb))
+           lb
+	   pow))
 
 (in-package succinct.common)
 
@@ -10,3 +11,8 @@
 
 (defun lb (n)
   (ceiling (log n 2)))
+
+(defun pow (base power)
+  (cond ((zerop power) 1)
+	((evenp power) (let ((a (pow base (floor power 2)))) (* a a)))
+	((oddp  power) (let ((a (pow base (floor power 2)))) (* base a a)))))

@@ -4,7 +4,8 @@
   (:export create-bits
 	   bref
 	   bits-length
-	   extract-bits))
+	   extract-bits
+	   bits-tostring))
 
 (in-package succinct.bits)
 
@@ -14,7 +15,7 @@
 
 (defun create-bits (length)
   (make-bits :length length
-	     :array (make-array (/ length 64)
+	     :array (make-array (ceiling length 64)
 				:element-type 'word)))
 
 (defun bref (bits idx)
@@ -36,3 +37,9 @@
 	(+ (ldb (byte (- 64 rem) rem) (aref (bits-array bits) div))
 	   (ash (ldb (byte (+ rem size -64) 0) (aref (bits-array bits) (1+ div)))
 		(- 64 rem))))))
+
+(defun bits-tostring (bits)
+  (with-output-to-string (o)
+    (loop
+       for i from 0 below (bits-length bits)
+       do (princ (bref bits i) o))))

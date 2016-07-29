@@ -57,7 +57,7 @@
 
 ;; large block with less zeros
 (defun get-n-branch (len)
-  (sqrt (lb len)))
+  (ceiling (sqrt (lb len))))
 
 (defun popcount-range (bits from to)
   (loop
@@ -67,19 +67,19 @@
 (defun create-tree (bits from to smallblock-size n-branch)
   (let* ((largeblock-size (- to from -1))
 	 (depth    (1+ (ceiling (log (ceiling largeblock-size smallblock-size) n-branch))))
-	 (n-nodes  (/ (1- (expt n-branch depth)) (1- n-branch)))
+	 (n-nodes  (floor (1- (pow n-branch depth)) (1- n-branch)))
 	 (elm-size (lb largeblock-size))
 	 (tree     (create-bitwise-vector elm-size n-nodes)))
     (loop
        for level from 0 below depth
        do (loop
-	     with offset = (/ (1- (expt n-branch level)) (1- n-branch))
-	     with width = (* smallblock-size (expt n-branch (- depth level 1)))
-	     for i from 0 below (expt n-branch level)
+	     with offset = (floor (1- (pow n-branch level)) (1- n-branch))
+	     with width = (* smallblock-size (pow n-branch (- depth level 1)))
+	     for i from 0 below (pow n-branch level)
 	     do (setf (bwvref tree (+ i offset))
 		      (popcount-range bits
-				      (min to (* width i))
-				      (min to (1- (* width (1+ i))))))))
+				      (min to (+ from (* width i)))
+				      (min to (+ from (* width (1+ i)) -1))))))
     (values depth tree)))
 
 (defun create-small-blocks (bits from to size)
@@ -92,10 +92,12 @@
     (loop
        with offset = 0
        for block-idx from 0 below blocks-size
-       do (set (bwvref offsets block-idx) offset)
+       do (setf (bwvref offsets block-idx) offset)
        do (loop
 	     for i from 0 below size
-	     for bit = (bref bits (+ from (* size block-idx) i))
+	     for bit-idx = (+ from (* size block-idx) i)
+	     while (<= bit-idx to)
+	     for bit = (bref bits bit-idx)
 	     sum bit into n-ones
 	     when (= 1 bit)
 	     do (setf (bwvref blocks (+ offset n-ones -1)) i)
@@ -142,10 +144,10 @@
 
 ;;; large block
 (defun create-large-block (bits from to)
-  (let ((border (expt border-const (lb (bits-length bits)))))
+  (let ((border (pow border-const (lb (bits-length bits)))))
     (if (> (- to from -1) border)
-	(create-large-block0 bits from to)
-	(create-large-block1 bits from to))))
+	(progn (princ 0) (create-large-block0 bits from to) )
+	(progn (princ 1) (create-large-block1 bits from to)))))
 
 (defun select-large-block (block n)
   (etypecase block
@@ -166,12 +168,13 @@
     (loop
        for block_idx from 0 below n-blocks
        with bits_idx = 0
+       do (format t "done ~a~%" block_idx)
        do (loop
-	     for j = bits_idx
+	     for j from bits_idx below len
 	     sum (bref bits j) into n-ones
-	     while (and (< n-ones ones-per-block) (< j len))
+	     while (< n-ones ones-per-block)
 	     finally (setf (aref blocks block_idx)
-			   (create-large-block bits (1+ bits_idx) j)
+			   (create-large-block bits bits_idx (min j (1- len)))
 			   bits_idx
 			   (1+ j))))
     (make-select-index :ones-per-block ones-per-block
