@@ -17,7 +17,7 @@
   table)
 
 (defun large-block0-size (block)
-  (length (large-block0-table block)))
+  (word-length (large-block0-table block)))
 
 (defstruct large-block1
   ;;; point where this block starts
@@ -32,9 +32,9 @@
   tree-depth)
 
 (defun large-block1-size (block)
-  (+ (length (large-block1-small-blocks block))
-     (length (large-block1-small-offsets block))
-     (length (large-block1-tree block))))
+  (+ (word-length (large-block1-small-blocks block))
+     (word-length (large-block1-small-offsets block))
+     (word-length (large-block1-tree block))))
 
 (defstruct select-index
   ones-per-block

@@ -1,7 +1,7 @@
 ;; -*- mode: lisp -*-
 
-(asdf:defsystem "succinct-suffix-array"
-    :description "succinct-suffix-array: implementation of compressed suffix array in Common Lisp"
+(asdf:defsystem "rankselect"
+    :description "rankselect implementation of fid in Common Lisp"
     :version "0.0.1"
     :author "Yuito Murase <yuito.murase@gmail.com>"
     :licence "MIT License"
@@ -16,4 +16,6 @@
 		 (:file "selectindex"
 			:depends-on ("bits" "bitwise-vector"))
 		 (:file "rankselect"
-			:depends-on ("rankindex" "selectindex"))))
+			:depends-on ("rankindex" "selectindex"))
+		 (:file "test"
+			:depends-on ("rankselect"))))

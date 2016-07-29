@@ -10,7 +10,7 @@
 (deftype word () '(unsigned-byte 64))
 
 (defun lb (n)
-  (ceiling (log n 2)))
+  (max 1 (ceiling (log n 2))))
 
 (defun pow (base power)
   (cond ((zerop power) 1)

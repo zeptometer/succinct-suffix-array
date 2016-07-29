@@ -2,7 +2,8 @@
   (:use :common-lisp
 	:succinct.common)
   (:export create-bitwise-vector
-	   bwvref))
+	   bwvref
+	   word-length))
 
 (in-package succinct.bitwise-vector)
 
@@ -40,3 +41,6 @@
 			(* (bitwise-vector-element-size ,bv) rem))
 		  (aref (bitwise-vector-array ,bv) div))
 	     ,bits))))
+
+(defun word-length (bv)
+  (length (bitwise-vector-array bv)))

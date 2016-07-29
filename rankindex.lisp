@@ -28,9 +28,9 @@
   r1 r2 r3)
 
 (defun rank-index-size (index)
-  (+ (length (rank-index-r1 index))
-     (length (rank-index-r2 index))
-     (length (rank-index-r3 index))))
+  (+ (word-length (rank-index-r1 index))
+     (word-length (rank-index-r2 index))
+     (word-length (rank-index-r3 index))))
 
 ;;; Rank Index Constructor
 ;; R1 table
